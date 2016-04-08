@@ -34,7 +34,7 @@ module Griddler
             cc: cc,
             subject: subject,
             text: message.text_part || message.body,
-            html: message.html_part || message.body,
+            html: message.html_part || nil,
             headers: raw_headers,
             attachments: attachment_files
           )
@@ -89,7 +89,8 @@ module Griddler
       end
 
       def attachment_files
-        # also based on griddler-sparkpost (https://github.com/PrestoDoctor/griddler-sparkpost, MIT license)
+        # also based on griddler-sparkpost (https://github.com/PrestoDoctor/griddler-sparkpost, MIT license);
+        # AWS doesn't presently support sending the attachments from the message through SNS, but ready if they do!
         message.attachments.map do |attachment|
           ActionDispatch::Http::UploadedFile.new({
             type: attachment.mime_type,

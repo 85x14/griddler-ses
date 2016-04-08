@@ -4,75 +4,80 @@ require 'sns_endpoint'
 module Griddler
   module Ses
     class Adapter
-      attr_reader :params
+      attr_reader :params, :raw_request
 
-      def initialize(params)
+      def initialize(params, raw_request)
         @params = params
+        @raw_request = raw_request
       end
 
       def self.normalize_params(params)
-        adapter = new(params)
+        adapter = new(params, self.raw_request)
         adapter.normalize_params
       end
 
       def normalize_params
-        # use sns_endpoint to parse and validate the sns msg
-        sns = SnsEndpoint::AWS::SNS::Message.new params
-        raise "Invalid SNS message" unless sns.authentic? && sns.topic_arn.end_with?('griddler')
+        # use sns_endpoint to parse and validate the sns message
+        sns_msg = SnsEndpoint::AWS::SNS::Message.new sns_json
+        raise "Invalid SNS message" unless sns_msg.authentic? && sns_msg.topic_arn.end_with?('griddler')
 
-        case sns.type
-          when :SubscriptionConfirmation
-            confirm_sns_subscription_request
-            bail_out_of_reply_handling!
-          when :Notification
-            ensure_valid_notification_type!
-            params.merge(
-              to: recipients,
-              from: sender,
-              cc: cc,
-              subject: subject,
-              text: message.text_part,
-              html: message.html_part,
-              headers: raw_headers,
-              attachments: attachment_files
-            )
-          else
-            raise "Invalid SNS message type"
-          end
+        case sns_msg.type
+        when :SubscriptionConfirmation
+          confirm_sns_subscription_request
+          # this is not an actual email reply (and griddler has no way to bail at this point), so return empty parameters
+          {}
+        when :Notification
+          ensure_valid_notification_type!
+          params.merge(
+            to: recipients,
+            from: sender,
+            cc: cc,
+            subject: subject,
+            text: message.text_part || message.body,
+            html: message.html_part || message.body,
+            headers: raw_headers,
+            attachments: attachment_files
+          )
+        else
+          raise "Invalid SNS message type"
         end
       end
 
       private
       def sns_json
-        @sns_json ||= params['_json'][0]
+        @sns_json ||= JSON.parse(raw_request.raw_post)
+      end
+
+      def email_json
+        @email_json ||= JSON.parse(sns_json['Message'])
       end
 
       def notification_type
-        sns_json['notificationType']
+        email_json['notificationType']
       end
 
       def recipients
-        sns_json['receipt']['recipients']
+        email_json['receipt']['recipients']
       end
 
       def sender
-        sns_json['mail']['commonHeaders']['from'].first
+        email_json['mail']['commonHeaders']['from'].first
       end
 
       def cc
-        sns_json['mail']['commonHeaders']['cc']
+        email_json['mail']['commonHeaders']['cc']
       end
 
       def subject
-        sns_json['mail']['commonHeaders']['subject']
-      end
-
-      def message
-        @message ||= Mail.read_from_string(sns_json['content'])
+        email_json['mail']['commonHeaders']['subject']
       end
 
       def header_array
-        sns_json['mail']['headers']
+        email_json['mail']['headers']
+      end
+
+      def message
+        @message ||= Mail.read_from_string(Base64.decode64(email_json['content']))
       end
 
       def raw_headers
@@ -107,13 +112,14 @@ module Griddler
         raise "Invalid SNS notification type (\"#{notification_type}\", expecting Received" unless notification_type == 'Received'
       end
 
-      def bail_out_of_reply_handling!
-        # no way to tell Griddler not to parse the webhook as a reply, so raise an exception to halt further processing
-        raise "Request is a subscription confirmation -- this is expected if you're configuring the subscription for AWS for the first time"
+      def confirm_sns_subscription_request
+        HTTParty.get sns_json['SubscribeURL']
       end
 
-      def confirm_sns_subscription_request
-        HTTParty.get params['SubscribeURL']
+      def self.raw_request
+        # TODO: this is an ugly hack using introspection to get the request from the calling controller; should update Griddler
+        # to provide the full request context
+        raw_request = binding.of_caller(2).eval('request')
       end
     end
   end

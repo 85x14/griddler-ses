@@ -19,7 +19,7 @@ And then execute:
 
 ## Usage
 
-TODO: Write usage instructions here
+1. Setup Amazon SES to receive emails -- see http://docs.aws.amazon.com/ses/latest/DeveloperGuide/receiving-email-setting-up.html
 
 
 ## Contributing

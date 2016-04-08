@@ -1,4 +1,5 @@
 require 'mail'
+require 'sns_endpoint'
 
 module Griddler
   module Ses
@@ -15,18 +16,30 @@ module Griddler
       end
 
       def normalize_params
-        raise "Invalid SNS notification type (\"#{notification_type}\", expecting Received" unless notification_type == 'Received'
+        # use sns_endpoint to parse and validate the sns msg
+        sns = SnsEndpoint::AWS::SNS::Message.new params
+        raise "Invalid SNS message" unless sns.authentic? && sns.topic_arn.end_with?('griddler')
 
-        params.merge(
-          to: recipients,
-          from: sender,
-          cc: cc,
-          subject: subject,
-          text: message.text_part,
-          html: message.html_part,
-          headers: raw_headers,
-          attachments: attachment_files
-        )
+        case sns.type
+          when :SubscriptionConfirmation
+            confirm_sns_subscription_request
+            bail_out_of_reply_handling!
+          when :Notification
+            ensure_valid_notification_type!
+            params.merge(
+              to: recipients,
+              from: sender,
+              cc: cc,
+              subject: subject,
+              text: message.text_part,
+              html: message.html_part,
+              headers: raw_headers,
+              attachments: attachment_files
+            )
+          else
+            raise "Invalid SNS message type"
+          end
+        end
       end
 
       private
@@ -88,6 +101,19 @@ module Griddler
         tempfile.write(content)
         tempfile.rewind
         tempfile
+      end
+
+      def ensure_valid_notification_type!
+        raise "Invalid SNS notification type (\"#{notification_type}\", expecting Received" unless notification_type == 'Received'
+      end
+
+      def bail_out_of_reply_handling!
+        # no way to tell Griddler not to parse the webhook as a reply, so raise an exception to halt further processing
+        raise "Request is a subscription confirmation -- this is expected if you're configuring the subscription for AWS for the first time"
+      end
+
+      def confirm_sns_subscription_request
+        HTTParty.get params['SubscribeURL']
       end
     end
   end

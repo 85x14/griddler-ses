@@ -21,6 +21,11 @@ And then execute:
 
 1. Setup Amazon SES to receive emails -- see http://docs.aws.amazon.com/ses/latest/DeveloperGuide/receiving-email-setting-up.html
 
+2. From AWS SES -> Rule Sets, choose to "Create Receipt Rule" and choose to use SNS.  Add an action with a new SNS topic that *ends in `_griddler`*, with a Base64 encoding.
+
+3. Go to AWS SNS (Simple Notification Service) -> Topics.  Click on your `_griddler` topic.  Add a subscription that points to your configured griddler endpoint (the default route is `/email_processor`).  You're server must be already running to confirm the subscription request!
+
+4. In your griddler handler, be sure to handle/ignore empty reply emails (ie. check for `email.headers.empty?`) to account for the fact that some hooks are just SNS's subscription handling.
 
 ## Contributing
 

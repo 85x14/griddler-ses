@@ -1,7 +1,10 @@
-require "griddler/ses/version"
+require 'griddler'
+require 'griddler/ses/version'
+require 'griddler/ses/adapter'
 
 module Griddler
   module Ses
-    # Your code goes here...
   end
 end
+
+Griddler.adapter_registry.register(:ses, Griddler::Ses::Adapter)

@@ -1,14 +1,14 @@
 # Griddler::Ses
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/griddler/ses`. To experiment with that code, run `bin/console` for an interactive prompt.
+This is a [Griddler](https://github.com/thoughtbot/griddler) adapter that allows you to parse email replies when used with Amazon SES.
 
-TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add these lines to your application's Gemfile:
 
 ```ruby
+gem 'griddler'
 gem 'griddler-ses'
 ```
 
@@ -16,23 +16,20 @@ And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install griddler-ses
 
 ## Usage
 
-TODO: Write usage instructions here
+1. Setup Amazon SES to receive emails -- see http://docs.aws.amazon.com/ses/latest/DeveloperGuide/receiving-email-setting-up.html
 
-## Development
+2. From AWS SES -> Rule Sets, choose to "Create Receipt Rule" and choose to use SNS.  Add an action with a new SNS topic that *ends in `_griddler`*, with a Base64 encoding.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+3. Go to AWS SNS (Simple Notification Service) -> Topics.  Click on your `_griddler` topic.  Add a subscription that points to your configured griddler endpoint (the default route is `/email_processor`).  You're server must be already running to confirm the subscription request!
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+4. In your griddler handler, be sure to handle/ignore empty reply emails (ie. check for `email.headers.empty?`) to account for the fact that some hooks are just SNS's subscription handling.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/griddler-ses.
+Bug reports and pull requests are welcome on GitHub at https://github.com/coupa/griddler-ses.
 
 
 ## License

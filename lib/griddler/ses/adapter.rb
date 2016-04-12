@@ -33,8 +33,8 @@ module Griddler
             from: sender,
             cc: cc,
             subject: subject,
-            text: message.text_part || message.body,
-            html: message.html_part || nil,
+            text: text_part,
+            html: html_part,
             headers: raw_headers,
             attachments: attachment_files
           )
@@ -78,6 +78,18 @@ module Griddler
 
       def message
         @message ||= Mail.read_from_string(Base64.decode64(email_json['content']))
+      end
+
+      def multipart?
+        message.parts.count > 0
+      end
+
+      def text_part
+        multipart? ? message.text_part.body.to_s : message.body.to_s
+      end
+
+      def html_part
+        multipart? ? message.html_part.body.to_s : nil
       end
 
       def raw_headers

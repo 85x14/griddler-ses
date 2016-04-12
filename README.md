@@ -29,7 +29,7 @@ And then execute:
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/coupa/griddler-ses.
+Bug reports and pull requests are welcome on GitHub at https://github.com/85x14/griddler-ses.
 
 
 ## License

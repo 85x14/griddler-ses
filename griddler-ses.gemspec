@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["kent.mewhort@coupa.com"]
 
   spec.summary       = %q{Griddler adapter for AWS SES (handle incoming email replies through SES)}
-  spec.homepage      = "https://github.com/coupa/griddler-ses"
+  spec.homepage      = "https://github.com/85x14/griddler-ses"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

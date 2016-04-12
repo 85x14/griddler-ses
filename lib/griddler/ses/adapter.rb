@@ -1,5 +1,6 @@
 require 'mail'
 require 'sns_endpoint'
+require 'net/http'
 
 module Griddler
   module Ses
@@ -126,7 +127,8 @@ module Griddler
       end
 
       def confirm_sns_subscription_request
-        HTTParty.get sns_json['SubscribeURL']
+        confirmation_endpoint = URI.parse(sns_json['SubscribeURL'])
+        Net::HTTP.get confirmation_endpoint
       end
 
       def self.raw_request

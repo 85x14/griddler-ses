@@ -33,6 +33,7 @@ module Griddler
             to: recipients,
             from: sender,
             cc: cc,
+            bcc: bcc,
             subject: subject,
             text: text_part,
             html: html_part,
@@ -58,7 +59,7 @@ module Griddler
       end
 
       def recipients
-        email_json['receipt']['recipients']
+        email_json['mail']['commonHeaders']['to']
       end
 
       def sender
@@ -66,7 +67,11 @@ module Griddler
       end
 
       def cc
-        email_json['mail']['commonHeaders']['cc']
+        email_json['mail']['commonHeaders']['cc'] || []
+      end
+
+      def bcc
+        email_json['mail']['commonHeaders']['bcc'] || []
       end
 
       def subject

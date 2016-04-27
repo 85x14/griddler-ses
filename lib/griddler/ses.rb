@@ -1,6 +1,8 @@
 require 'griddler'
 require 'griddler/ses/version'
 require 'griddler/ses/adapter'
+require 'griddler/ses/middleware'
+require 'griddler/ses/railtie'
 
 module Griddler
   module Ses

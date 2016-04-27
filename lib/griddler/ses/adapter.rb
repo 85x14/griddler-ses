@@ -5,15 +5,14 @@ require 'net/http'
 module Griddler
   module Ses
     class Adapter
-      attr_reader :params, :raw_request
+      attr_reader :sns_json
 
-      def initialize(params, raw_request)
-        @params = params
-        @raw_request = raw_request
+      def initialize(params)
+        @sns_json = params
       end
 
       def self.normalize_params(params)
-        adapter = new(params, self.raw_request)
+        adapter = new(params)
         adapter.normalize_params
       end
 
@@ -29,7 +28,7 @@ module Griddler
           {}
         when :Notification
           ensure_valid_notification_type!
-          params.merge(
+          sns_json.merge(
             to: recipients,
             from: sender,
             cc: cc,
@@ -46,10 +45,6 @@ module Griddler
       end
 
       private
-      def sns_json
-        @sns_json ||= JSON.parse(raw_request.raw_post)
-      end
-
       def email_json
         @email_json ||= JSON.parse(sns_json['Message'])
       end
@@ -134,12 +129,6 @@ module Griddler
       def confirm_sns_subscription_request
         confirmation_endpoint = URI.parse(sns_json['SubscribeURL'])
         Net::HTTP.get confirmation_endpoint
-      end
-
-      def self.raw_request
-        # TODO: this is an ugly hack using introspection to get the request from the calling controller; should update Griddler
-        # to provide the full request context
-        raw_request = binding.of_caller(2).eval('request')
       end
     end
   end

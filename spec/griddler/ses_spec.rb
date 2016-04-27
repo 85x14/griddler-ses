@@ -16,39 +16,29 @@ describe Griddler::Ses::Adapter do
       sns_message[:mail][:commonHeaders][:cc] = ['emily@example.com']
       sns_message[:mail][:commonHeaders][:from] = ['There <there@example.com>']
 
-      # Griddler::Ses works on the full raw request, rather than params (there are no params because AWS
-      # sets the type as text/plain)
-      allow(Griddler::Ses::Adapter).to receive(:raw_request).and_return(request)
+      allow_any_instance_of(Griddler::Ses::Adapter).to receive(:sns_json).and_return(default_params)
     end
 
     it_behaves_like 'Griddler adapter', :ses, {}
   end
 
   describe '.normalize_params' do
-    before do
-      allow(Griddler::Ses::Adapter).to receive(:raw_request).and_return(request)
-    end
-
     it 'parses out the "to" addresses, returning an array' do
-      expect(Griddler::Ses::Adapter.normalize_params({})[:to]).to eq ['"Mr Fugushima at Fugu, Inc" <hi@example.com>', 'Foo bar <foo@example.com>']
+      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:to]).to eq ['"Mr Fugushima at Fugu, Inc" <hi@example.com>', 'Foo bar <foo@example.com>']
     end
 
     it 'parses out the "from" address, returning a string' do
-      expect(Griddler::Ses::Adapter.normalize_params({})[:from]).to eq "Test There <there@example.com>"
+      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:from]).to eq "Test There <there@example.com>"
     end
 
     it 'parses out the "subject", returning a string' do
-      expect(Griddler::Ses::Adapter.normalize_params({})[:subject]).to eq "Test"
+      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:subject]).to eq "Test"
     end
 
     it 'parses out the text' do
-      expect(Griddler::Ses::Adapter.normalize_params({})[:text]).to eq "Hi\n"
+      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:text]).to eq "Hi\n"
     end
   end
-
-  let(:request) {
-    instance_double("request", raw_post: default_params.to_json)
-  }
 
   let(:default_params) {
     {
@@ -62,7 +52,7 @@ describe Griddler::Ses::Adapter do
       "Signature": "g9FJ0tZvhNJE0uhaIAkFpk4tgRkLfQJyseZIsJy4gNcN1tUeABpIQ7pt7ICZItteAI0UAGT34BFPK0eji/e+/ZplV0wiLWzQAUJyW3hjFP3MWaeSIyXIXCA7i7yTcXvVxqyxWbnmg09RML/D4rMzQlm5Tp1SJVqL3eMR+b7qH0PPelUY3VWDA+/VITeXyG8d4Qa3ssCHHet7SMPeV1keYtAFvRefd1Uq6ACtcHT6BfVNeeGivz85+unTNRN/HNvV/htUzyFu+Gi8gv646IInVl4OP8F44OxcP8M3v9X8dIE1wqKogKZdXLkO7K1QD7occm8HV7vrdIYJf5072VBvQA==",
       "SigningCertURL": "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-bb750dd426d95ee9390147a5624348ee.pem",
       "UnsubscribeURL": "https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:522466693830:staging_replies_griddler:c6688868-1126-42fd-a6df-2156257538ec"
-    }
+    }.as_json
   }
 
   let(:sns_message) {

@@ -28,7 +28,7 @@ module Griddler
           {}
         when :Notification
           ensure_valid_notification_type!
-          params.merge(
+          sns_json.merge(
             to: recipients,
             from: sender,
             cc: cc,

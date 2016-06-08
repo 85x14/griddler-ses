@@ -61,6 +61,14 @@ module Griddler
         email_json['mail']['headers']
       end
 
+      def raw_headers
+        # SNS gives us an array of hashes with name value, which we need to convert back to raw headers;
+        # based on griddler-sparkpost (https://github.com/PrestoDoctor/griddler-sparkpost, MIT license)
+        header_array.inject([]) { |raw_headers, sns_hash|
+          raw_headers.push("#{sns_hash['name']}: #{sns_hash['value']}")
+        }.join("\r\n")
+      end
+
       def message
         @message ||= Mail.read_from_string(Base64.decode64(email_json['content']))
       end
@@ -75,14 +83,6 @@ module Griddler
 
       def html_part
         multipart? ? message.html_part.body.to_s : nil
-      end
-
-      def raw_headers
-        # SNS gives us an array of hashes with name value, which we need to convert back to raw headers;
-        # based on griddler-sparkpost (https://github.com/PrestoDoctor/griddler-sparkpost, MIT license)
-        header_array.inject([]) { |raw_headers, sns_hash|
-          raw_headers.push("#{sns_hash['name']}: #{sns_hash['value']}")
-        }.join("\r\n")
       end
 
       def attachment_files

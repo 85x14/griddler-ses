@@ -4,6 +4,8 @@ require 'griddler/ses/adapter'
 require 'griddler/ses/middleware'
 require 'griddler/ses/railtie'
 require 'griddler/ses/config'
+require 'griddler/ses/attachments_wrapper'
+require 'griddler/ses/prepare_notification_params'
 
 module Griddler
   module Ses

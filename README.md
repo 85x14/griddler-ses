@@ -34,6 +34,9 @@ In order to provide some custom configuration, please, add `config/initializers/
 ```ruby
 Griddler::Ses.config do |config|
   # config.topic_suffix = 'griddler'
+  # config.aws_region = ''
+  # config.aws_access_key_id = ''
+  # config.aws_secret_access_key = ''
 end
 ```
 

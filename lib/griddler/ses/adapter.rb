@@ -17,9 +17,8 @@ module Griddler
       end
 
       def normalize_params
-        # use sns_endpoint to parse and validate the sns message
         sns_msg = SnsEndpoint::AWS::SNS::Message.new sns_json
-        raise "Invalid SNS message" unless sns_msg.authentic? && sns_msg.topic_arn.end_with?('griddler')
+        raise "Invalid SNS message" unless message_valid?(sns_msg)
 
         case sns_msg.type
         when :SubscriptionConfirmation
@@ -45,6 +44,11 @@ module Griddler
       end
 
       private
+
+      def message_valid?(sns_msg)
+        sns_msg.authentic? && sns_msg.topic_arn.end_with?(Griddler::Ses.config.topic_suffix)
+      end
+
       def email_json
         @email_json ||= JSON.parse(sns_json['Message'])
       end

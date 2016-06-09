@@ -70,7 +70,16 @@ module Griddler
       end
 
       def message
-        @message ||= Mail.read_from_string(Base64.decode64(email_json['content']))
+        @message ||= Mail.read_from_string(Base64.decode64(resolve_message_content))
+      end
+
+      def resolve_message_content
+        return email_json['content'] unless action_s3?
+        Griddler::Ses::MessageContentFromS3Fetcher.new(email_json['receipt']['action']).call
+      end
+
+      def action_s3?
+        email_json['receipt']['action'] == 'S3'
       end
 
       def multipart?

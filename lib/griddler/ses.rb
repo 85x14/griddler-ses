@@ -6,7 +6,9 @@ require 'griddler/ses/railtie'
 require 'griddler/ses/config'
 require 'griddler/ses/attachments_wrapper'
 require 'griddler/ses/prepare_notification_params'
-require 'griddler/ses/message_content_from_s3_fetcher'
+require 'griddler/ses/message_content'
+require 'griddler/ses/message_content/from_params_fetcher'
+require 'griddler/ses/message_content/s3_fetcher'
 
 module Griddler
   module Ses

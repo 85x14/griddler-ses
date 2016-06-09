@@ -1,10 +1,11 @@
 module Griddler
   module Ses
     class PrepareNotificationParams
-      attr_reader :sns_json
+      attr_reader :sns_json, :email_json
 
       def initialize(sns_json)
         @sns_json = sns_json
+        @email_json = JSON.parse(sns_json['Message'])
       end
 
       def call
@@ -27,10 +28,6 @@ module Griddler
       def ensure_valid_notification_type!
         return if notification_type == 'Received'
         raise "Invalid SNS notification type (\"#{notification_type}\", expecting Received"
-      end
-
-      def email_json
-        @email_json ||= JSON.parse(sns_json['Message'])
       end
 
       def notification_type
@@ -70,16 +67,11 @@ module Griddler
       end
 
       def message
-        @message ||= Mail.read_from_string(Base64.decode64(resolve_message_content))
+        @message ||= Mail.read_from_string(resolve_message_content)
       end
 
       def resolve_message_content
-        return email_json['content'] unless action_s3?
-        Griddler::Ses::MessageContentFromS3Fetcher.new(email_json['receipt']['action']).call
-      end
-
-      def action_s3?
-        email_json['receipt']['action'] == 'S3'
+        Griddler::Ses::MessageContent.resolve(email_json)
       end
 
       def multipart?

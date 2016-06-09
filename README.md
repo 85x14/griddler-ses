@@ -40,6 +40,13 @@ Griddler::Ses.config do |config|
 end
 ```
 
+## Processing big emails
+
+By default SNS is able to process email with size less or equal 150Kb (the size is calculated with images, headers, text body). To be able to
+accept emails with big images you must to setup flow, when email body is uploaded to the S3 and to the server the information where to find
+that email content will be posted. So the flow for such cases will be a little different: there is no content in the payload, you must to
+read it from S3 file instead. Flow with S3 has limitations as well: your email can has maximum size 30Mb.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/85x14/griddler-ses.

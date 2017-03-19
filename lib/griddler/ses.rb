@@ -1,3 +1,4 @@
+require 'aws/sns_message'
 require 'griddler'
 require 'griddler/ses/version'
 require 'griddler/ses/adapter'

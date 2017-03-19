@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Griddler::Ses::Adapter do
   before do
     # mock the hash check on the notification, as we've zero'd the numbers
-    allow_any_instance_of(SnsEndpoint::AWS::SNS::Message).to receive(:authentic?).and_return(true)
+    allow_any_instance_of(AWS::SnsMessage).to receive(:authentic?).and_return(true)
   end
 
   it 'registers itself with griddler' do

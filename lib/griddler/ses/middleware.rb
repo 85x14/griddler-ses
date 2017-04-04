@@ -22,7 +22,8 @@ module Griddler
       end
 
       def is_griddler_request?(request)
-        request['REQUEST_PATH'] == griddler_path
+        # Fix for servers that do not include 'request_path' in headers
+        request['REQUEST_PATH'] == griddler_path || request['REQUEST_URI'] == griddler_path
       end
 
       def is_aws_sns_request?(request)

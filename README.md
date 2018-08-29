@@ -1,4 +1,4 @@
-# Griddler::Ses
+# Griddler::AmazonSES
 
 This is a [Griddler](https://github.com/thoughtbot/griddler) adapter that allows you to parse email replies when used with Amazon SES.
 
@@ -9,7 +9,7 @@ Add these lines to your application's Gemfile:
 
 ```ruby
 gem 'griddler'
-gem 'griddler-ses'
+gem 'griddler-amazon_ses'
 ```
 
 And then execute:
@@ -29,7 +29,7 @@ And then execute:
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/85x14/griddler-ses.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ccallebs/griddler-amazon_ses.
 
 
 ## License

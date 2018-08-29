@@ -1,9 +1,8 @@
 require 'mail'
-require 'sns_endpoint'
 require 'net/http'
 
 module Griddler
-  module Ses
+  module AmazonSES
     class Adapter
       attr_reader :sns_json
 
@@ -17,8 +16,7 @@ module Griddler
       end
 
       def normalize_params
-        # use sns_endpoint to parse and validate the sns message
-        sns_msg = SnsEndpoint::AWS::SNS::Message.new sns_json
+        sns_msg = AWS::SnsMessage.new sns_json
         raise "Invalid SNS message" unless sns_msg.authentic? && sns_msg.topic_arn.end_with?('griddler')
 
         case sns_msg.type

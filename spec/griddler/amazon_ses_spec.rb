@@ -7,7 +7,7 @@ describe Griddler::AmazonSES::Adapter do
   end
 
   it 'registers itself with griddler' do
-    expect(Griddler.adapter_registry[:ses]).to eq Griddler::AmazonSES::Adapter
+    expect(Griddler.adapter_registry[:amazon_ses]).to eq Griddler::AmazonSES::Adapter
   end
 
   describe "Griddler shared examples" do
@@ -19,7 +19,7 @@ describe Griddler::AmazonSES::Adapter do
       allow_any_instance_of(Griddler::AmazonSES::Adapter).to receive(:sns_json).and_return(default_params)
     end
 
-    it_behaves_like 'Griddler adapter', :ses, {}
+    it_behaves_like 'Griddler adapter', :amazon_ses, {}
   end
 
   describe '.normalize_params' do

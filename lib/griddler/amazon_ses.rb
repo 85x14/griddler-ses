@@ -10,4 +10,4 @@ module Griddler
   end
 end
 
-Griddler.adapter_registry.register(:ses, Griddler::AmazonSES::Adapter)
+Griddler.adapter_registry.register(:amazon_ses, Griddler::AmazonSES::Adapter)

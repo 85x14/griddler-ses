@@ -2,7 +2,7 @@ require 'mail'
 require 'net/http'
 
 module Griddler
-  module Ses
+  module AmazonSES
     class Adapter
       attr_reader :sns_json
 

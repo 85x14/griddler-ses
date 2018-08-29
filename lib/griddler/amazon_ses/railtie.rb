@@ -1,7 +1,7 @@
 require 'rails/version'
 
 module Griddler
-  module Ses
+  module AmazonSES
     class Railtie < Rails::Railtie
       if Rails::VERSION::MAJOR < 5
         middleware = ActionDispatch::ParamsParser

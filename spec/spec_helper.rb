@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'griddler'
 require 'griddler/testing'
-require 'griddler/ses'
+require 'griddler/amazon_ses'
 require 'rails/version'
 require 'action_dispatch'
 

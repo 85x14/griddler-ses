@@ -1,3 +1,5 @@
+require 'rails/version'
+
 module Griddler
   module Ses
     class Railtie < Rails::Railtie

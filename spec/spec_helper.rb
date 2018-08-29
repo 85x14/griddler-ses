@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'griddler'
 require 'griddler/testing'
 require 'griddler/ses'
+require 'rails/version'
 require 'action_dispatch'
 
 RSpec.configure do |config|

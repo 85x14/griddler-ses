@@ -7,7 +7,7 @@ describe Griddler::Ses::Adapter do
   end
 
   it 'registers itself with griddler' do
-    Griddler.adapter_registry[:ses].should eq Griddler::Ses::Adapter
+    expect(Griddler.adapter_registry[:ses]).to eq Griddler::Ses::Adapter
   end
 
   describe "Griddler shared examples" do

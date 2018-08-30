@@ -10,7 +10,7 @@ module Griddler
       end
 
       initializer "griddler_ses.configure_rails_initialization" do |app|
-        Rails.application.middleware.insert_before middleware, Griddler::Ses::Middleware
+        Rails.application.middleware.insert_before middleware, Griddler::AmazonSES::Middleware
       end
     end
   end

@@ -84,11 +84,15 @@ module Griddler
       end
 
       def text_part
-        multipart? ? message.text_part.body.to_s : message.body.to_s
+        force_body_to_utf_8_string(multipart? ? message.text_part.body : message.body)
       end
 
       def html_part
-        multipart? ? message.html_part.body.to_s : nil
+        multipart? ? force_body_to_utf_8_string(message.html_part.body) : nil
+      end
+
+      def force_body_to_utf_8_string(message_body)
+        message_body.to_s.force_encoding(Encoding::UTF_8)
       end
 
       def raw_headers

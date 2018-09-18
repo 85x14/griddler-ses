@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe Griddler::Ses::Adapter do
+describe Griddler::AmazonSES::Adapter do
   before do
     # mock the hash check on the notification, as we've zero'd the numbers
-    allow_any_instance_of(SnsEndpoint::AWS::SNS::Message).to receive(:authentic?).and_return(true)
+    allow_any_instance_of(AWS::SnsMessage).to receive(:authentic?).and_return(true)
   end
 
   it 'registers itself with griddler' do
-    Griddler.adapter_registry[:ses].should eq Griddler::Ses::Adapter
+    expect(Griddler.adapter_registry[:amazon_ses]).to eq Griddler::AmazonSES::Adapter
   end
 
   describe "Griddler shared examples" do
@@ -16,27 +16,31 @@ describe Griddler::Ses::Adapter do
       sns_message[:mail][:commonHeaders][:cc] = ['emily@example.com']
       sns_message[:mail][:commonHeaders][:from] = ['There <there@example.com>']
 
-      allow_any_instance_of(Griddler::Ses::Adapter).to receive(:sns_json).and_return(default_params)
+      allow_any_instance_of(Griddler::AmazonSES::Adapter).to receive(:sns_json).and_return(default_params)
     end
 
-    it_behaves_like 'Griddler adapter', :ses, {}
+    it_behaves_like 'Griddler adapter', :amazon_ses, {}
   end
 
   describe '.normalize_params' do
     it 'parses out the "to" addresses, returning an array' do
-      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:to]).to eq ['"Mr Fugushima at Fugu, Inc" <hi@example.com>', 'Foo bar <foo@example.com>']
+      expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:to]).to eq ['"Mr Fugushima at Fugu, Inc" <hi@example.com>', 'Foo bar <foo@example.com>']
     end
 
     it 'parses out the "from" address, returning a string' do
-      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:from]).to eq "Test There <there@example.com>"
+      expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:from]).to eq "Test There <there@example.com>"
     end
 
     it 'parses out the "subject", returning a string' do
-      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:subject]).to eq "Test"
+      expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:subject]).to eq "Test"
     end
 
     it 'parses out the text' do
-      expect(Griddler::Ses::Adapter.normalize_params(default_params)[:text]).to eq "Hi\n"
+      expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:text]).to eq "Hi\n"
+    end
+
+    it 'should return the text body in UTF-8' do
+      expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:text].encoding.to_s).to eq "UTF-8"
     end
   end
 

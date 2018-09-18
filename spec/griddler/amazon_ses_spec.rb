@@ -38,6 +38,10 @@ describe Griddler::AmazonSES::Adapter do
     it 'parses out the text' do
       expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:text]).to eq "Hi\n"
     end
+
+    it 'should return the text body in UTF-8' do
+      expect(Griddler::AmazonSES::Adapter.normalize_params(default_params)[:text].encoding.to_s).to eq "UTF-8"
+    end
   end
 
   let(:default_params) {
